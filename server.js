@@ -16,18 +16,30 @@ app.get('/', function(req, res){
 // GET /todos
 // GET /todos?completed=true
 // GET /todos?completed=false
+// GET /todos?completed=false?q=work
 
 app.get('/todos', function(req, res){
     var queryParams = req.query;
     var filteredTodos = todos;
 
     console.log(queryParams);
-    console.log(queryParams.hasOwnProperty('completed'));
 
     if ( queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
       filteredTodos = _.where(filteredTodos, { completed : true });
     } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
       filteredTodos = _.where(filteredTodos, { completed : false });
+    }
+
+    if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0 ) {
+      filteredTodos = _.filter(filteredTodos, function(todo){
+        // indexOf(arg) returns the position of the arg which is greater than -1 if arg exists
+        if (todo.description.indexOf(queryParams.q) > -1) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+
     }
 
     res.json(filteredTodos);

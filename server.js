@@ -50,9 +50,6 @@ app.post('/todos', function(req, res){
 // DELETE /todos/:id
 
 app.delete('/todos/:id',function(req, res){
-    // get input id
-    // find object in collection
-    // remove from collection
 
     var todoId = parseInt(req.params.id);
     var matchedToDo = _.findWhere(todos, {id: todoId});
@@ -65,6 +62,29 @@ app.delete('/todos/:id',function(req, res){
     else {
       res.status(404).json({"error" : "no todo found with that id"});
     }
+
+});
+
+// PUT /todos/:id
+app.put('/todos/:id', function(req, res){
+  var body = _.pick( req.body, "description","completed", "id");
+
+  if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0 || !_.isNumber(body.id) ){
+    return res.status(400).send();
+  }
+
+  var todoId = parseInt(req.params.id);
+  var matchedToDo = _.findWhere(todos, {id:todoId});
+
+  if (matchedToDo) {
+    matchedToDo.id = body.id;
+    matchedToDo.completed = body.completed;
+    matchedToDo.description = body.description.trim();
+    res.json(matchedToDo);
+
+  }else {
+    res.status(404).json({"error" : "no todo found with that id"});
+  }
 
 });
 

@@ -32,12 +32,11 @@ app.get('/todos', function(req, res){
 
     if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0 ) {
       filteredTodos = _.filter(filteredTodos, function(todo){
-        // indexOf(arg) returns the position of the arg which is greater than -1 if arg exists
-        if (todo.description.indexOf(queryParams.q) > -1) {
-          return true;
-        } else {
-          return false;
-        }
+        // indexOf(arg) returns the position of the arg which is greater than -1 if arg exists in string
+        // return checks to see if statement and returns true or false
+        // toLowerCase normalises the comparison so it is in the same format (lowercase) 
+        return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
+
       });
 
     }

@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var db = require('./db.js');
 
 var app = express();
 var PORT = process.env.PORT || 3000;
@@ -34,7 +35,7 @@ app.get('/todos', function(req, res){
       filteredTodos = _.filter(filteredTodos, function(todo){
         // indexOf(arg) returns the position of the arg which is greater than -1 if arg exists in string
         // return checks to see if statement and returns true or false
-        // toLowerCase normalises the comparison so it is in the same format (lowercase) 
+        // toLowerCase normalises the comparison so it is in the same format (lowercase)
         return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
 
       });
@@ -60,16 +61,29 @@ app.get('/todos/:id', function(req, res){
 app.post('/todos', function(req, res){
     var body = _.pick(req.body, 'description' , 'completed');
 
-    if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0 ){
-      return res.status(400).send();
-    }
+    var todo = db.todo;
 
-    body.description = body.description.trim();
-    body.id = todoNextId;
-    todos.push(body);
-    todoNextId++;
+    todo.create({
+      description : body.description,
+      completed : body.completed,
+    }).then(function(){
+      res.json(todo.toJSON());
+    })
+    .catch(function(e){
+      console.log(e);
+      res.status(404).send();
+    });
 
-    res.json(body);
+    // if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0 ){
+    //   return res.status(400).send();
+    // }
+    //
+    // body.description = body.description.trim();
+    // body.id = todoNextId;
+    // todos.push(body);
+    // todoNextId++;
+    //
+    // res.json(body);
 
 });
 
@@ -120,7 +134,8 @@ app.put('/todos/:id', function(req, res){
 
 });
 
-
-app.listen(PORT, function(){
-  console.log('Express listening on port : ' + PORT);
+db.sequelize.sync().then(function(){
+  app.listen(PORT, function(){
+    console.log('Express listening on port : ' + PORT);
+  });
 });

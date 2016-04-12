@@ -67,15 +67,9 @@ app.get('/todos/:id', function(req, res) {
 app.post('/todos', function(req, res) {
     var body = _.pick(req.body, 'description', 'completed');
 
-    var todo = db.todo;
-
-    todo.create({
-            description: body.description,
-            completed: body.completed,
-        }).then(function(todo) {
+    db.todo.create(body).then(function(todo) {
             res.json(todo.toJSON());
-        })
-        .catch(function(e) {
+        }, function(e){
             res.status(404).json(e);
         });
 

@@ -20,48 +20,51 @@ app.get('/', function(req, res) {
 // GET /todos?completed=false?q=work
 
 app.get('/todos', function(req, res) {
-    var queryParams = req.query;
-    var filteredTodos = todos;
+    var query = req.query;
+    var where = {};
 
-    console.log(queryParams);
-
-    if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
-        filteredTodos = _.where(filteredTodos, {
-            completed: true
-        });
-    } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
-        filteredTodos = _.where(filteredTodos, {
-            completed: false
-        });
+    if (query.hasOwnProperty('completed') && query.completed === 'false') {
+        where.completed = false;
+    } else if (query.hasOwnProperty('completed') && query.completed === 'true') {
+        where.completed = true;
     }
 
-    if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
-        filteredTodos = _.filter(filteredTodos, function(todo) {
-            // indexOf(arg) returns the position of the arg which is greater than -1 if arg exists in string
-            // return checks to see if statement and returns true or false
-            // toLowerCase normalises the comparison so it is in the same format (lowercase)
-            return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
-
-        });
-
+    if (query.hasOwnProperty('q') && query.q.length > 0) {
+        where.description = {
+            $like: '%' + query.q + '%'
+        };
     }
 
-    res.json(filteredTodos);
+
+    console.log(where);
+
+    db.todo.findAll({
+        where: where
+    }).then(function(todos) {
+        if (!!todos) {
+            res.json(todos);
+        } else {
+            res.status(404).send('no todos found');
+        }
+    }, function(e) {
+        res.status(500).send(e);
+    });
+
 });
 
 // GET /todos/:id
 app.get('/todos/:id', function(req, res) {
     var todoId = parseInt(req.params.id, 10);
 
-    db.todo.findById(todoId).then(function(todo){
-      // double exclaimation mark checks if truthy or falsy (google !)
-      if (!!todo) {
-        res.json(todo);
-      } else {
-        res.status(404).send();
-      }
-    }, function(e){
-      res.status(500).send();
+    db.todo.findById(todoId).then(function(todo) {
+        // double exclaimation mark checks if truthy or falsy (google !)
+        if (!!todo) {
+            res.json(todo);
+        } else {
+            res.status(404).send();
+        }
+    }, function(e) {
+        res.status(500).send();
     });
 
 });
@@ -71,10 +74,10 @@ app.post('/todos', function(req, res) {
     var body = _.pick(req.body, 'description', 'completed');
 
     db.todo.create(body).then(function(todo) {
-            res.json(todo.toJSON());
-        }, function(e){
-            res.status(404).json(e);
-        });
+        res.json(todo.toJSON());
+    }, function(e) {
+        res.status(404).json(e);
+    });
 });
 
 // DELETE /todos/:id

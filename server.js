@@ -87,15 +87,31 @@ app.delete('/todos/:id', function(req, res) {
     var todoId = parseInt(req.params.id);
     var where = {};
 
-    db.todo.findById(todoId).then(function(todo){
-      if (!!todo) {
-        where.id  = todoId;
-        db.todo.destroy({where : where});
-        res.json(todo);
-      } else {
-         res.status(404).json();
+    db.todo.destroy({
+      where : {
+        id : todoId
       }
+    }).then(function(deleteRows){
+      if (deleteRows === 0 ) {
+        res.status(404).json({
+          error: "No todos with id"
+        });
+      } else {
+        res.status(204).send();
+      }
+    }, function(e){
+      res.status(500).send();
     });
+
+    // db.todo.findById(todoId).then(function(todo){
+    //   if (!!todo) {
+    //     where.id  = todoId;
+    //     db.todo.destroy({where : where});
+    //     res.json(todo);
+    //   } else {
+    //      res.status(404).json();
+    //   }
+    // });
 
     // var matchedToDo = _.findWhere(todos, {
     //     id: todoId

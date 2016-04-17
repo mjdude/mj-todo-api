@@ -88,19 +88,19 @@ app.delete('/todos/:id', function(req, res) {
     var where = {};
 
     db.todo.destroy({
-      where : {
-        id : todoId
-      }
-    }).then(function(deleteRows){
-      if (deleteRows === 0 ) {
-        res.status(404).json({
-          error: "No todos with id"
-        });
-      } else {
-        res.status(204).send();
-      }
-    }, function(e){
-      res.status(500).send();
+        where: {
+            id: todoId
+        }
+    }).then(function(deleteRows) {
+        if (deleteRows === 0) {
+            res.status(404).json({
+                error: "No todos with id"
+            });
+        } else {
+            res.status(204).send();
+        }
+    }, function(e) {
+        res.status(500).send();
     });
 
 
@@ -112,7 +112,7 @@ app.put('/todos/:id', function(req, res) {
     var body = _.pick(req.body, "description", "completed");
     var attributes = {};
 
-    if (body.hasOwnProperty('completed') ) {
+    if (body.hasOwnProperty('completed')) {
         attributes.completed = body.completed;
     }
 
@@ -123,18 +123,18 @@ app.put('/todos/:id', function(req, res) {
     console.log(todoId);
     console.log(attributes);
 
-    db.todo.findById(todoId).then(function(todo){
-      if (todo) {
-        todo.update(attributes).then(function(todo){
-          res.json(todo.toJSON());
-        }, function(e){
-          res.status(400).json(e);
-        })
-      } else {
-        res.status(404).send();
-      }
-    }, function(e){
-      res.status(500).json(e);
+    db.todo.findById(todoId).then(function(todo) {
+        if (todo) {
+            todo.update(attributes).then(function(todo) {
+                res.json(todo.toJSON());
+            }, function(e) {
+                res.status(400).json(e);
+            })
+        } else {
+            res.status(404).send();
+        }
+    }, function(e) {
+        res.status(500).json(e);
     });
 
 

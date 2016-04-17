@@ -137,20 +137,6 @@ app.put('/todos/:id', function(req, res) {
       res.status(500).json(e);
     });
 
-    // db.todo.update(attributes, {
-    //     fields : ["completed" , "description"],
-    //     where : {
-    //       id : todoId
-    //     }
-    // }).then(function(updated){
-    //   if (updated === 0) {
-    //       res.status(404).send();
-    //   } else {
-    //     res.json("Updated todo");
-    //   }
-    // }, function(e){
-    //     res.status(500).send(e);
-    // });
 
 
 });

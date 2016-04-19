@@ -164,14 +164,12 @@ app.post('/users/login' , function(req, res){
         email : body.email
       }
     }).then(function(user){
-      if (user) {
-        var hashedPassword = bcrypt.hashSync(body.password , user.salt);
-        if (user.hashedPassword = hashedPassword) {
-            res.json(user);
-        }
-      } else {
-        res.status(401).send();
+      if (!user || !bcrypt.compareSync(body.password, user.get('password_hash')) ) {
+          return res.status(401).send();
       }
+
+      res.json(user.toPublicJSON());
+
 
     }, function(e){
       res.status(500).json(e);

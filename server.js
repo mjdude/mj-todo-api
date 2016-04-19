@@ -154,33 +154,29 @@ app.post('/users' , function(req, res){
 
 app.post('/users/login' , function(req, res){
     var body = _.pick(req.body, 'email', 'password');
-    var where = {};
 
-    if (body.hasOwnProperty('email')
-        && typeof body.email === 'string'
-        && body.hasOwnProperty('password')
-        && typeof body.password === 'string') {
-          console.log('validation passed');
-          res.json(body);
-    } else {
-      res.status(404).send();
+    if (typeof body.email !== 'string' || typeof body.password !== 'string') {
+      return res.status(400).send();
     }
 
-    // db.users.findAll({
-    //   where : where
-    // }).then(function(user){
-    //   if (user) {
-    //     var hashedPassword = bcrypt.hashSync(body.password , user.salt);
-    //     if (user.hashedPassword = hashedPassword) {
-    //         res.json(user);
-    //     } else {
-    //       res.status(404).send();
-    //     }
-    //   }
-    //
-    // }, function(e){
-    //   res.status(400).json(e);
-    // });
+    db.user.findOne({
+      where : {
+        email : body.email
+      }
+    }).then(function(user){
+      if (user) {
+        var hashedPassword = bcrypt.hashSync(body.password , user.salt);
+        if (user.hashedPassword = hashedPassword) {
+            res.json(user);
+        }
+      } else {
+        res.status(401).send();
+      }
+
+    }, function(e){
+      res.status(500).json(e);
+    });
+
 });
 
 db.sequelize.sync({force: true}).then(function() {

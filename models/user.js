@@ -88,6 +88,7 @@ module.exports = function(sequelize, Datatypes) {
 
                   return token;
                 } catch(e){
+                  console.error(e);
                   return undefined;
                 }
             }

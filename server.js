@@ -65,7 +65,6 @@ app.get('/todos/:id', middleware.requireAuthentication ,function(req, res) {
       userId: req.user.get('id')
     };
 
-    console.log(where);
 
     db.todo.findOne({
       where : where
@@ -194,7 +193,7 @@ app.post('/users/login' , function(req, res){
 });
 
 db.sequelize.sync({
-  // force: true
+   force: true
 }).then(function() {
     app.listen(PORT, function() {
         console.log('Express listening on port : ' + PORT + '!');

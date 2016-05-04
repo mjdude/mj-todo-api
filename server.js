@@ -195,6 +195,16 @@ app.post('/users/login', function(req, res) {
 
 });
 
+// DELETE /users/login
+
+app.delete('/users/login', middleware.requireAuthentication ,function(req, res){
+  req.token.destroy().then(function(){
+    res.status(204).send();
+  }).catch(function(){
+    res.status(500).send();
+  });
+});
+
 db.sequelize.sync({
      force: true
 }).then(function() {
